@@ -1,0 +1,7 @@
+index.html
+*.mp4
+*.webm
+ffmpeg2pass*
+
+flowplayer/latest
+flowplayer/[0-9]*

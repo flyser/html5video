@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"> 
+<!-- 1. skin -->
+<link rel="stylesheet" href="/flowplayer/5.4.6/skin/functional.css">
+ 
+<!-- 2. jquery library -->
+<script src="/flowplayer/5.4.6/jquery.min.js"></script>
+ 
+<!-- 3. flowplayer -->
+<script src="/flowplayer/5.4.6/flowplayer.min.js"></script>
+
+<style type="text/css">
+	/* manual quality selection widget */
+	.flowplayer .fp-qsel {
+	position: absolute;
+	top: 40px;
+	right: 5px;
+	}
+	.flowplayer.is-mouseout .fp-qsel {
+	opacity: 0;
+	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+	/* same transition as other ui elements like fullscreen */
+	-webkit-transition: opacity .15s .3s;
+	-moz-transition: opacity .15s .3s;
+	transition: opacity .15s .3s;
+	}
+	.flowplayer.is-mouseover .fp-qsel {
+	opacity: 1;
+	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+	}
+	/* hide selector in splash state */
+	.flowplayer.is-splash .fp-qsel {
+	display: none;
+	}
+	
+	/* buttons */
+	.flowplayer .fp-qsel div {
+	padding: 0.5ex;
+	margin: 0 0.5ex 1ex 0;
+	font-weight: bold;
+	font-size: 90%;
+	color: #080808;
+	background-color: #eee;
+	background-color: rgba(238, 238, 238, 0.8);
+	cursor: pointer;
+	-webkit-border-radius: 1ex;
+	-moz-border-radius: 1ex;
+	border-radius: 1ex;
+	}
+	.flowplayer.is-fullscreen .fp-qsel div {
+	font-size: 100%;
+	}
+	.flowplayer .fp-qsel div.fp-selectedres {
+	color: #00a7c8;
+	background-color: #333;
+	background-color: rgba(51, 51, 51, 0.6);
+	cursor: default;
+	}
+</style>
+<script>
+flowplayer(function (api, root) {
+  var hls = flowplayer.support.video && api.conf.engine === "html5" &&
+          !!$("<video/>")[0].canPlayType("application/x-mpegurl").replace("no", ""),
+      qsel,
+      selected = "fp-selectedres",
+ 
+      // for demo info, not in production:
+      playerindex = $(".flowplayer").index(root),
+      srcinfo = $(".clip").eq(playerindex),
+      resinfo = $(".res").eq(playerindex);
+ 
+  // manual resolution selection
+  if (api.conf.resolutions !== undefined && flowplayer.support.inlineVideo) {
+ 
+    // create the manual quality selection widget and append it to the UI
+    qsel = $("<div/>").addClass("fp-qsel").appendTo(".fp-ui", root);
+ 
+    $.each(api.conf.resolutions, function (i, resolution) {
+      // generate a selector button for each resolution
+ 
+      $("<div/>").addClass(resolution.selectedDefault ? "fp-defaultres " + selected : "")
+        .text(resolution.label)
+        .click(function() {
+          if (!$(this).hasClass(selected)) {
+            var buttons = $("div", qsel),
+                // store current position
+                pos = api.ready && !api.finished ? api.video.time : 0;
+                playing = api.playing;
+ 
+            api.load(resolution.sources, function (e, api) {
+              // seek to stored position
+              if (pos) {
+                api.seek(pos);
+                if (playing) {
+                    api.resume();
+                }
+              } else {
+				  api.pause();
+			  }
+            });
+ 
+            buttons.each(function () {
+              $(this).toggleClass(selected, buttons.index(this) === i);
+            });
+          }
+        }).appendTo(qsel);
+    });
+	some_a = $("<a>", {href: "%%ORIGINAL_FILENAME%%", download: ""}).appendTo(qsel)
+	$("<div/>").text("Download").appendTo(some_a);
+ 
+    api.bind("unload", function () {
+      // highlight default resolution
+      $("div", qsel).each(function () {
+        var button = $(this);
+ 
+        button.toggleClass(selected, button.hasClass("fp-defaultres"));
+      });
+    });
+  }
+
+  // report current src and resolution for demonstratation purposes
+  api.bind("ready", function(e, api, video) {
+    srcinfo.text(video.src);
+    if (video.type != "mpegurl") {
+      resinfo.text("resolution: " + video.width + "x" + video.height);
+    } else {
+      resinfo.text("automatic choice of resolution");
+    }
+  }).bind("unload", function () {
+    // reinsert non-breakable space
+    srcinfo.text("\u00A0");
+    resinfo.text("\u00A0");
+  });
+  // Start in windowed-fullscreen mode and give the user the option to go into full-fullscreen mode
+  api.bind("load", function () {
+     jQuery('div.flowplayer').addClass("is-fullscreen");
+  }).bind("fullscreen-exit", function(e, api) {
+     jQuery('div.flowplayer').addClass("is-fullscreen");
+  });
+});
+ 
+// install players when document is ready
+$(function () {
+      defaultresolutionindex = 0,
+      // the resolutions offered for manual selection in the player
+      resolutions = [
+		{
+			label: "144p",
+			sources: [
+				{ webm:    "video_144p.webm" },
+				{ mp4:     "video_144p.mp4" },
+			]
+		}, {
+			label: "240p",
+			lofi: true,
+			sources: [
+				{ webm:    "video_240p.webm" },
+				{ mp4:     "video_240p.mp4" },
+			]
+		}, {
+			label: "360p",
+			isMobileDefault: true,
+			sources: [
+				{ webm:    "video_360p.webm" },
+				{ mp4:     "video_360p.mp4" },
+			]
+		}, {
+			label: "480p",
+			sources: [
+				{ webm:    "video_480p.webm" },
+				{ mp4:     "video_480p.mp4" },
+			]
+		}, {
+			label: "720p",
+			isDesktopDefault: true,
+			sources: [
+				{ webm:    "video_720p.webm" },
+				{ mp4:     "video_720p.mp4" },
+			]
+		}, {
+			label: "1080p",
+			sources: [
+				{ webm:    "video_1080p.webm" },
+				{ mp4:     "video_1080p.mp4" },
+			]
+/*		}, {
+			label: "Original",
+			sources: [
+				{ webm:    "video_original.webm" },
+				{ mp4:     "video_original.mp4" },
+			]*/
+		}];
+
+  // set default resolution index depending on capabilities
+  $.each(resolutions, function (i, resolution) {
+    if ((resolution.isDesktopDefault && flowplayer.support.inlineVideo && !flowplayer.support.touch ) ||
+		(resolution.isMobileDefault && flowplayer.support.touch) ||
+        (resolution.lofi && !flowplayer.support.inlineVideo) ) {
+      defaultresolutionindex = i;
+      resolution.selectedDefault = true;
+      return false;
+    }
+  });
+ 
+  // install the player
+  $("#flowplayer").flowplayer({
+    adaptiveRatio: true,
+    embed: false,
+    poster: "poster.jpeg",
+    resolutions: resolutions,
+    playlist: [resolutions[defaultresolutionindex].sources],
+
+    // Use native fullscreen on mobile webkit browsers (iPad, Android) instead
+    // of full browser window. The screen will be bigger but native video
+    // controls will be in use instead of customizable Flowplayer controls
+    native_fullscreen: true,
+  });
+
+});
+</script>
+</head>
+<body>
+  <div id="flowplayer"></div>
+</body>
+</head>
