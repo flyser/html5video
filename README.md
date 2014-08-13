@@ -1,5 +1,5 @@
 A small script that generates a encodes a video in multiple resolutions for
-html5 browsers and generates a fullscreen player index.html page.
+html5 browsers and generates a fullscreen video player index.html.
 
 ## Dependencies ##
 
@@ -23,11 +23,13 @@ html5 browsers and generates a fullscreen player index.html page.
 Repeat steps 5-8 for every new video.
 
 Also make sure your webserver has the following mimetypes configured:
+
 	AddType video/ogg .ogv
 	AddType video/mp4 .mp4
 	AddType video/webm .webm
 
 And make sure mp4 and webm files are not gzip compressed by your webserver:
+
 	SetEnvIfNoCase Request_URI \.(mp4|webm)$ no-gzip dont-vary
 
 ## Known Issues ##
