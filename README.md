@@ -1,4 +1,4 @@
-A small script that generates a encodes a video in multiple resolutions for
+A small script that encodes a video in multiple resolutions for
 html5 browsers and generates a fullscreen video player index.html.
 
 ## Dependencies ##
