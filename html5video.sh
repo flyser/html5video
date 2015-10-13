@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if ! [[ 1 -eq 1 ]] 2>/dev/null ; then
+  alias [[=[
+fi
+
 set -e
 
 if [[ "x$1" == "x" ]]; then

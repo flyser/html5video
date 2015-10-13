@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if ! [[ 1 -eq 1 ]] 2>/dev/null ; then
+  alias [[=[
+fi
+
 set -e
 
 VERSION="5.4.6"
